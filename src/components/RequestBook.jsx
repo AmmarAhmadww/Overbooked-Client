@@ -11,6 +11,17 @@ const RequestBook = ({ user, onClose }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    // Validate all required fields
+    if (!bookName || !author || !description) {
+      setToast({
+        show: true,
+        message: 'Please fill in all required fields',
+        type: 'error'
+      });
+      return;
+    }
+
     if (!user) {
       setToast({
         show: true,
@@ -30,6 +41,7 @@ const RequestBook = ({ user, onClose }) => {
         body: JSON.stringify({
           userId: user._id,
           userName: user.username,
+          userEmail: user.email,
           bookName,
           author,
           description,
@@ -37,8 +49,10 @@ const RequestBook = ({ user, onClose }) => {
         }),
       });
 
+      const data = await response.json();
+
       if (!response.ok) {
-        throw new Error('Failed to submit request');
+        throw new Error(data.message || 'Failed to submit request');
       }
 
       setToast({

@@ -10,12 +10,16 @@ import { defaultLayoutPlugin } from '@react-pdf-viewer/default-layout';
 import { zoomPlugin } from '@react-pdf-viewer/zoom';
 import LibraryChat from './components/LibraryChat';
 import RequestBook from './components/RequestBook';
+import LoadingAnimation from './components/LoadingAnimation';
+import { motion } from 'framer-motion';
+import RatingModal from "./components/RatingModal";
+import DefaultBookCover from './components/DefaultBookCover';
 
 // Import styles
 import '@react-pdf-viewer/core/lib/styles/index.css';
 import '@react-pdf-viewer/default-layout/lib/styles/index.css';
 
-const PDFViewer = ({ pdfUrl, onClose, bookName, initialPage = 1, onPageChange }) => {
+const PDFViewer = ({ pdfUrl, onClose, bookName, initialPage = 1, onPageChange, isPreview = false }) => {
   const defaultLayoutPluginInstance = defaultLayoutPlugin();
   const zoomPluginInstance = zoomPlugin();
 
@@ -67,139 +71,161 @@ const PDFViewer = ({ pdfUrl, onClose, bookName, initialPage = 1, onPageChange })
   );
 };
 
-const BookCard = ({ book, onIssue, onReturn, isIssued, onReadBook, onDelete, isAdmin }) => {
+const BookCard = ({ book, onIssue, onReturn, isIssued, onReadBook, onDelete, isAdmin, onRate }) => {
   const pdfUrl = book.pdf ? `http://localhost:5000${book.pdf}` : null;
+  const [showDescription, setShowDescription] = useState(false);
+  const [imageError, setImageError] = useState(false);
+
+  // Function to get the correct image URL
+  const getCoverUrl = (coverPath) => {
+    if (!coverPath) return null;
+    // If it's already a full URL, return it
+    if (coverPath.startsWith('http')) return coverPath;
+    // If it's a path, prepend the server URL
+    return `http://localhost:5000${coverPath}`;
+  };
 
   return (
-    <div 
-      id={`book-${book._id}`} 
-      className="bg-white rounded-xl shadow-lg overflow-hidden transform transition-all duration-300 hover:scale-105 hover:shadow-xl min-w-[280px]"
-    >
-      {/* Book Cover with Gradient Overlay */}
-      <div className="relative h-[420px]">
-        <img 
-          src={book.cover} 
-          className="w-full h-full object-cover bg-gray-50"
-          alt={book.bookName}
-          onError={(e) => {
-            e.target.onerror = null;
-            e.target.src = 'https://via.placeholder.com/400x600?text=No+Cover+Available';
-          }}
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
+    <div className="bg-[#1E1E1E] rounded-xl shadow-xl overflow-hidden transition-all duration-300 hover:scale-105 hover:shadow-2xl">
+      {/* Book Cover */}
+      <div className="relative h-[400px]">
+        {!imageError ? (
+          <img 
+            src={getCoverUrl(book.cover)}
+            className="w-full h-full object-cover"
+            alt={book.bookName}
+            onError={(e) => {
+              setImageError(true);
+              e.target.onerror = null;
+            }}
+          />
+        ) : (
+          <DefaultBookCover />
+        )}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/90 to-transparent" />
         <div className="absolute bottom-4 left-4 right-4">
-          <h4 className="text-xl font-bold text-white mb-2 line-clamp-2">
+          <h4 className="text-xl font-bold text-white mb-2">
             {book.bookName}
           </h4>
+          <p className="text-gray-300 text-sm">by {book.author}</p>
         </div>
       </div>
 
       {/* Book Details */}
-      <div className="p-5 space-y-4">
+      <div className="p-4 space-y-4 bg-[#1E1E1E]">
         {/* Stats Grid */}
-        <div className="grid grid-cols-3 gap-4 text-center">
-          <div className="space-y-1">
-            <div className="flex items-center justify-center">
-              <Star className="h-5 w-5 text-yellow-400" />
-            </div>
-            <p className="text-sm text-gray-600">Rating</p>
-            <p className="font-semibold">{book.rating}/5</p>
+        <div className="grid grid-cols-3 gap-3">
+          <div className="bg-[#242424] p-3 rounded-lg text-center">
+            <Star className="h-5 w-5 text-yellow-500 mx-auto mb-1" />
+            <p className="text-white text-sm">{book.rating}/5</p>
+            <p className="text-gray-400 text-xs">Rating</p>
           </div>
-          <div className="space-y-1">
-            <div className="flex items-center justify-center">
-              <BookOpen className="h-5 w-5 text-green-500" />
-            </div>
-            <p className="text-sm text-gray-600">Available</p>
-            <p className="font-semibold">{book.available}</p>
+          <div className="bg-[#242424] p-3 rounded-lg text-center">
+            <BookOpen className="h-5 w-5 text-blue-500 mx-auto mb-1" />
+            {book.available > 0 ? (
+              <>
+                <p className="text-white text-sm">{book.available}</p>
+                <p className="text-gray-400 text-xs">Available</p>
+              </>
+            ) : (
+              <>
+                <p className="text-red-400 text-sm">0</p>
+                <p className="text-red-400/70 text-xs">Out of Stock</p>
+              </>
+            )}
           </div>
-          <div className="space-y-1">
-            <div className="flex items-center justify-center">
-              <Users className="h-5 w-5 text-blue-500" />
-            </div>
-            <p className="text-sm text-gray-600">Issued</p>
-            <p className="font-semibold">{book.issued}</p>
-          </div>
-          <div className="space-y-1">
-            <div className="flex items-center justify-center">
-              <FolderOpen className="h-5 w-5 text-indigo-500" />
-            </div>
-            <p className="text-sm text-gray-600">Category</p>
-            <p className="font-semibold">{book.category}</p>
+          <div className="bg-[#242424] p-3 rounded-lg text-center">
+            <FolderOpen className="h-5 w-5 text-purple-500 mx-auto mb-1" />
+            <p className="text-white text-sm">{book.category}</p>
+            <p className="text-gray-400 text-xs">Category</p>
           </div>
         </div>
 
-        {/* Read Count Badge */}
-        {book.readCount > 0 && (
-          <div className="flex justify-center">
-            <span className="px-3 py-1 bg-blue-100 text-blue-800 text-sm font-medium rounded-full">
-              Read {book.readCount} times
-            </span>
+        {/* Description Section */}
+        {book.description && (
+          <div>
+            <button
+              onClick={() => setShowDescription(!showDescription)}
+              className="w-full text-cyan-400 hover:text-cyan-300 text-sm font-medium py-2 border border-gray-800 rounded-lg hover:bg-[#242424] transition-colors duration-300 flex items-center justify-center gap-2"
+            >
+              {showDescription ? (
+                <>
+                  <span>Hide Description</span>
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
+                  </svg>
+                </>
+              ) : (
+                <>
+                  <span>Show Description</span>
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </>
+              )}
+            </button>
+            {showDescription && (
+              <div className="mt-3 text-sm text-gray-400 border-t border-gray-800 pt-3 max-h-32 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-700 scrollbar-track-transparent">
+                <p className="leading-relaxed">{book.description}</p>
+              </div>
+            )}
           </div>
         )}
 
         {/* Action Buttons */}
-        <div className="space-y-2">
-          {pdfUrl && isIssued ? (
-            <button
-              onClick={onReadBook}
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 px-4 rounded-lg transition duration-300 flex items-center justify-center gap-2"
-            >
-              <BookOpen className="h-5 w-5" />
-              Read Book
-            </button>
-          ) : pdfUrl && (
-            <button
-              className="w-full bg-gray-400 text-white font-semibold py-2.5 px-4 rounded-lg cursor-not-allowed"
-              disabled
-            >
-              Issue to Read
-            </button>
-          )}
-          
-          {isIssued ? (
-            <>
-              <div className="py-2 px-3 bg-blue-100 text-blue-800 rounded-md text-sm font-medium text-center">
-                Already Issued
-              </div>
-              <button 
-                onClick={() => onReturn(book._id, book.bookName)}
-                className="w-full bg-yellow-500 hover:bg-yellow-600 text-white font-semibold py-2.5 px-4 rounded-lg transition duration-300 flex items-center justify-center gap-2"
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2" />
-                </svg>
-                Return Book
-              </button>
-            </>
-          ) : book.available <= 0 ? (
+        <div className="flex flex-col sm:flex-row gap-2">
+          {isAdmin ? (
+            // Admin actions
             <button 
-              className="w-full bg-gray-400 text-white font-semibold py-2.5 px-4 rounded-lg cursor-not-allowed"
-              disabled
+              onClick={() => onDelete(book._id)}
+              className="flex-1 bg-red-600/10 hover:bg-red-600/20 text-red-400 border border-red-500/50 py-2 px-4 rounded-lg transition-all duration-300 text-sm flex items-center justify-center gap-2 whitespace-nowrap"
             >
-              Out of Stock
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+              </svg>
+              Delete
             </button>
           ) : (
-            <button
-              onClick={() => onIssue(book._id)}
-              className="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-2.5 px-4 rounded-lg transition duration-300 flex items-center justify-center gap-2"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-              </svg>
-              Request Book
-            </button>
-          )}
-
-          {isAdmin && (
-            <button
-              onClick={() => onDelete(book._id)}
-              className="w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-2.5 px-4 rounded-lg transition duration-300 flex items-center justify-center gap-2"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2" />
-              </svg>
-              Delete Book
-            </button>
+            // User actions
+            <>
+              {isIssued ? (
+                <div className="flex flex-col sm:flex-row gap-2 w-full">
+                  <button
+                    onClick={() => onReturn(book._id)}
+                    className="flex-1 bg-yellow-600/10 hover:bg-yellow-600/20 text-yellow-400 border border-yellow-500/50 py-2 px-4 rounded-lg transition-all duration-300 text-sm flex items-center justify-center gap-2"
+                  >
+                    Return Book
+                  </button>
+                  {pdfUrl && (
+                    <button
+                      onClick={() => onReadBook(book)}
+                      className="flex-1 bg-blue-600/10 hover:bg-blue-600/20 text-blue-400 border border-blue-500/50 py-2 px-4 rounded-lg transition-all duration-300 text-sm flex items-center justify-center gap-2"
+                    >
+                      <BookOpen className="h-4 w-4" />
+                      Read Book
+                    </button>
+                  )}
+                  <button
+                    onClick={() => onRate(book._id)}
+                    className="flex-1 bg-purple-600/10 hover:bg-purple-600/20 text-purple-400 border border-purple-500/50 py-2 px-4 rounded-lg transition-all duration-300 text-sm flex items-center justify-center gap-2"
+                  >
+                    <Star className="h-4 w-4" />
+                    Rate Book
+                  </button>
+                </div>
+              ) : (
+                <button
+                  onClick={() => onIssue(book._id)}
+                  disabled={book.available <= 0}
+                  className={`w-full py-2 px-4 rounded-lg transition-all duration-300 text-sm flex items-center justify-center gap-2
+                    ${book.available > 0 
+                      ? "bg-cyan-600/10 hover:bg-cyan-600/20 text-cyan-400 border border-cyan-500/50" 
+                      : "bg-gray-600/10 text-gray-400 border border-gray-500/50 cursor-not-allowed"}`}
+                >
+                  {book.available > 0 ? "Issue Book" : "Out of Stock"}
+                </button>
+              )}
+            </>
           )}
         </div>
       </div>
@@ -220,17 +246,7 @@ const StatCard = ({ title, value, icon: Icon, color }) => (
 );
 
 const Library = ({ user, onUserUpdate }) => {
-  if (!user) {
-    return (
-      <div className="flex justify-center items-center h-screen">
-        <div className="bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-3 rounded relative" role="alert">
-          <strong className="font-bold">Please log in</strong>
-          <span className="block sm:inline"> to access the library.</span>
-        </div>
-      </div>
-    );
-  }
-
+  const [isLoading, setIsLoading] = useState(true);
   const [books, setBooks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -239,10 +255,13 @@ const Library = ({ user, onUserUpdate }) => {
   const [showPdfViewer, setShowPdfViewer] = useState(false);
   const [selectedBook, setSelectedBook] = useState(null);
   const [readingProgress, setReadingProgress] = useState({});
-  const [selectedCategory, setSelectedCategory] = useState(null);
+  const [selectedCategory, setSelectedCategory] = useState('All');
   const [authors, setAuthors] = useState([]);
   const [showChat, setShowChat] = useState(false);
   const [showRequestModal, setShowRequestModal] = useState(false);
+  const [showRatingModal, setShowRatingModal] = useState(false);
+  const [selectedBookForRating, setSelectedBookForRating] = useState(null);
+  const [totalUsers, setTotalUsers] = useState(0);
   const location = useLocation();
   const bookGridRef = useRef(null);
 
@@ -259,11 +278,69 @@ const Library = ({ user, onUserUpdate }) => {
     { name: 'Technology', color: 'red' }
   ];
 
+  // Animation variants
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1
+      }
+    }
+  };
+
+  const itemVariants = {
+    hidden: { y: 20, opacity: 0 },
+    visible: {
+      y: 0,
+      opacity: 1,
+      transition: {
+        type: "spring",
+        stiffness: 100
+      }
+    }
+  };
+
+  const fadeInUp = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { 
+      opacity: 1, 
+      y: 0,
+      transition: {
+        duration: 0.5,
+        ease: "easeOut"
+      }
+    }
+  };
+
+  const staggerContainer = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1,
+        delayChildren: 0.3
+      }
+    }
+  };
+
+  const scaleIn = {
+    hidden: { scale: 0.8, opacity: 0 },
+    visible: {
+      scale: 1,
+      opacity: 1,
+      transition: {
+        duration: 0.4,
+        ease: "easeOut"
+      }
+    }
+  };
+
   // Filter books based on both search term and category
   const filteredBooks = books.filter((book) => {
     const matchesSearch = book.bookName.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          book.author.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCategory = !selectedCategory || book.category === selectedCategory;
+    const matchesCategory = selectedCategory === 'All' || book.category === selectedCategory;
     return matchesSearch && matchesCategory;
   });
 
@@ -427,7 +504,15 @@ const Library = ({ user, onUserUpdate }) => {
     }
   };
 
-  const handleReadBook = (book) => {
+  const handleReadBook = (book, isPreview = false) => {
+    if (!book?.pdf) {
+      setToast({
+        show: true,
+        message: 'PDF not available for this book',
+        type: 'error'
+      });
+      return;
+    }
     setSelectedBook(book);
     setShowPdfViewer(true);
     document.body.style.overflow = 'hidden';
@@ -476,7 +561,7 @@ const Library = ({ user, onUserUpdate }) => {
   // Add category click handler
   const handleCategoryClick = (categoryName) => {
     // If clicking the same category, clear the filter
-    setSelectedCategory(categoryName === selectedCategory ? null : categoryName);
+    setSelectedCategory(categoryName === selectedCategory ? 'All' : categoryName);
   };
 
   const handleDeleteBook = async (bookID) => {
@@ -507,6 +592,46 @@ const Library = ({ user, onUserUpdate }) => {
     }
   };
 
+  const handleRateBook = async (bookId, rating) => {
+    try {
+      const response = await fetch(`http://localhost:5000/library/rate`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          bookId,
+          userId: user._id,
+          rating
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to rate book");
+      }
+
+      const data = await response.json();
+      
+      // Update the books state with the new rating
+      setBooks(books.map(book => 
+        book._id === bookId 
+          ? { ...book, rating: data.newRating }
+          : book
+      ));
+
+      showToast("Rating submitted successfully", "success");
+    } catch (error) {
+      console.error("Error rating book:", error);
+      showToast(error.message, "error");
+    }
+  };
+
+  const onRate = (bookId) => {
+    const book = books.find(b => b._id === bookId);
+    setSelectedBookForRating(book);
+    setShowRatingModal(true);
+  };
+
   useEffect(() => {
     if (location.state?.scrollToBookId) {
       const bookElement = document.getElementById(`book-${location.state.scrollToBookId}`);
@@ -521,11 +646,51 @@ const Library = ({ user, onUserUpdate }) => {
     }
   }, [location.state?.scrollToBookId, books]);
 
-  if (loading) {
+  useEffect(() => {
+    // Force loading animation for 1.5 seconds
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 1500);
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  useEffect(() => {
+    const fetchTotalUsers = async () => {
+      try {
+        const response = await fetch('http://localhost:5000/users/count');
+        if (!response.ok) {
+          throw new Error('Failed to fetch user count');
+        }
+        const data = await response.json();
+        setTotalUsers(data.count);
+      } catch (error) {
+        console.error('Error fetching user count:', error);
+        setTotalUsers(0);
+      }
+    };
+
+    fetchTotalUsers();
+  }, []);
+
+  if (isLoading) {
+    return <LoadingAnimation onComplete={() => setIsLoading(false)} duration={1500} />;
+  }
+
+  if (!user) {
     return (
       <div className="flex justify-center items-center h-screen">
-        <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-blue-500"></div>
+        <div className="bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-3 rounded relative" role="alert">
+          <strong className="font-bold">Please log in</strong>
+          <span className="block sm:inline"> to access the library.</span>
+        </div>
       </div>
+    );
+  }
+
+  if (loading) {
+    return (
+      <LoadingAnimation />
     );
   }
 
@@ -539,10 +704,20 @@ const Library = ({ user, onUserUpdate }) => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 py-8">
+    <motion.div 
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.5 }}
+      className="min-h-screen bg-[#0a0a0a] py-6"
+    >
       <div className="max-w-[2000px] mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Header Section */}
-        <div className="flex flex-col sm:flex-row justify-between items-center mb-6">
+        {/* Header Section with new animation */}
+        <motion.div 
+          variants={fadeInUp}
+          initial="hidden"
+          animate="visible"
+          className="flex flex-col sm:flex-row justify-between items-center mb-6"
+        >
           <h1 className="text-3xl font-bold text-gray-900 mb-4 sm:mb-0">
             Library
           </h1>
@@ -565,158 +740,306 @@ const Library = ({ user, onUserUpdate }) => {
               Request Book
             </button>
           </div>
-        </div>
+        </motion.div>
 
-        {/* Stats and Categories Section */}
-        <div className="mb-8 grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Quick Stats */}
-          <div className="bg-white p-4 rounded-xl shadow-md">
-            <h2 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
-              <BookOpen className="h-5 w-5 text-blue-600" />
+        {/* Stats and Categories Section with new animation */}
+        <motion.div 
+          variants={staggerContainer}
+          initial="hidden"
+          animate="visible"
+          className="mb-8 grid grid-cols-1 md:grid-cols-2 gap-6"
+        >
+          {/* Library Stats */}
+          <motion.div 
+            variants={scaleIn}
+            className="bg-[#1E1E1E] p-4 rounded-xl shadow-md"
+          >
+            <h2 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+              <BookOpen className="h-5 w-5 text-purple-400" />
               Library Stats
             </h2>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              <StatCard 
-                title="Total Books" 
-                value={books.length} 
-                icon={BookOpen}
-                color="blue"
-              />
-              <StatCard 
-                title="Books Issued" 
-                value={issuedBooks.length} 
-                icon={Users}
-                color="green"
-              />
-              <StatCard 
-                title="Available Books" 
-                value={availableBooks.length} 
-                icon={BookOpen}
-                color="purple"
-              />
+            <div className="grid grid-cols-3 gap-4">
+              <div className="bg-[#242424] p-4 rounded-lg">
+                <div className="flex items-center gap-2 mb-2">
+                  <BookOpen className="h-5 w-5 text-blue-400" />
+                  <span className="text-gray-400 text-sm">Total Books</span>
+                </div>
+                <p className="text-2xl font-bold text-white">{books.length}</p>
+              </div>
+              <div className="bg-[#242424] p-4 rounded-lg">
+                <div className="flex items-center gap-2 mb-2">
+                  <Users className="h-5 w-5 text-green-400" />
+                  <span className="text-gray-400 text-sm">Books Issued</span>
+                </div>
+                <p className="text-2xl font-bold text-white">
+                  {books.reduce((acc, book) => acc + (book.issued || 0), 0)}
+                </p>
+              </div>
+              <div className="bg-[#242424] p-4 rounded-lg">
+                <div className="flex items-center gap-2 mb-2">
+                  <BookOpen className="h-5 w-5 text-purple-400" />
+                  <span className="text-gray-400 text-sm">Available</span>
+                </div>
+                <p className="text-2xl font-bold text-white">
+                  {books.reduce((acc, book) => acc + (book.available || 0), 0)}
+                </p>
+              </div>
+              <div className="bg-[#242424] p-4 rounded-lg">
+                <div className="flex items-center gap-2 mb-2">
+                  <Users className="h-5 w-5 text-yellow-400" />
+                  <span className="text-gray-400 text-sm">Total Users</span>
+                </div>
+                <p className="text-2xl font-bold text-white">
+                  {totalUsers || 0}
+                </p>
+              </div>
+              <div className="bg-[#242424] p-4 rounded-lg">
+                <div className="flex items-center gap-2 mb-2">
+                  <FolderOpen className="h-5 w-5 text-orange-400" />
+                  <span className="text-gray-400 text-sm">Categories</span>
+                </div>
+                <p className="text-2xl font-bold text-white">
+                  {new Set(books.map(book => book.category)).size}
+                </p>
+              </div>
+              <div className="bg-[#242424] p-4 rounded-lg">
+                <div className="flex items-center gap-2 mb-2">
+                  <Users className="h-5 w-5 text-cyan-400" />
+                  <span className="text-gray-400 text-sm">Authors</span>
+                </div>
+                <p className="text-2xl font-bold text-white">
+                  {new Set(books.map(book => book.author)).size}
+                </p>
+              </div>
             </div>
-          </div>
+          </motion.div>
 
           {/* Categories */}
-          <div className="bg-white p-4 rounded-xl shadow-md">
-            <h2 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
-              <FolderOpen className="h-5 w-5 text-indigo-600" />
+          <motion.div 
+            variants={scaleIn}
+            className="bg-[#1E1E1E] p-4 rounded-xl shadow-md"
+          >
+            <h2 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+              <FolderOpen className="h-5 w-5 text-purple-400" />
               Categories
             </h2>
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-              {categories.map((category) => {
-                const count = books.filter(book => book.category === category.name).length;
-                return (
-                  <button
-                    key={category.name}
-                    onClick={() => handleCategoryClick(category.name)}
-                    className={`flex items-center justify-between p-2 rounded-lg 
-                      ${selectedCategory === category.name 
-                        ? `bg-${category.color}-100 text-${category.color}-800` 
-                        : 'bg-gray-50 hover:bg-gray-100'} 
-                      transition-colors cursor-pointer`}
-                  >
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+              <button
+                onClick={() => handleCategoryClick('All')}
+                className={`flex items-center justify-between p-3 rounded-lg transition-colors
+                  ${selectedCategory === 'All' 
+                    ? 'bg-purple-600/10 text-purple-400 border border-purple-500/50' 
+                    : 'bg-[#242424] text-gray-300 hover:bg-[#2a2a2a]'}`}
+              >
+                <span className="text-sm">All Categories</span>
+              </button>
+              {categories.map(category => (
+                <button
+                  key={category.name}
+                  onClick={() => handleCategoryClick(category.name)}
+                  className={`flex items-center justify-between p-3 rounded-lg transition-colors
+                    ${selectedCategory === category.name 
+                      ? `bg-${category.color}-600/10 text-${category.color}-400 border border-${category.color}-500/50` 
+                      : 'bg-[#242424] text-gray-300 hover:bg-[#2a2a2a]'}`}
+                >
+                  <div className="flex items-center gap-2">
+                    {/* Only show dot if it's not Fantasy */}
+                    {category.name !== 'Fantasy' && (
+                      <div className={`w-2 h-2 rounded-full bg-${category.color}-400`}></div>
+                    )}
                     <span className="text-sm">{category.name}</span>
-                    <span className={`px-2 py-1 rounded-full text-xs bg-${category.color}-100 text-${category.color}-700`}>
-                      {count}
-                    </span>
-                  </button>
-                );
-              })}
+                  </div>
+                  <span className="text-xs text-gray-500">
+                    {books.filter(book => book.category === category.name).length}
+                  </span>
+                </button>
+              ))}
             </div>
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
 
-        {/* Search Bar */}
-        <div className="mb-8 flex justify-center">
-          <div className="relative max-w-md w-full">
+        {/* Search Bar with new animation */}
+        <motion.div 
+          variants={fadeInUp}
+          initial="hidden"
+          animate="visible"
+          className="mb-8 space-y-4 md:space-y-0 md:flex md:items-center md:justify-between"
+        >
+          <motion.div 
+            initial={{ x: -20, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            className="relative flex-1 max-w-xl"
+          >
             <input
               type="text"
-              className="w-full pl-10 pr-4 py-2 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white shadow-sm"
-              placeholder="Search books..."
+              placeholder="Search books by title or author..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full px-4 py-2 bg-gray-800 text-white rounded-lg focus:ring-2 focus:ring-purple-500 focus:outline-none"
             />
-            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <Search className="h-5 w-5 text-gray-400" />
-            </div>
-          </div>
-        </div>
+            <Search className="absolute right-3 top-2.5 text-gray-400" />
+          </motion.div>
+        </motion.div>
 
-        {/* Main Content */}
-        <div className="flex flex-col lg:flex-row gap-8 px-4 sm:px-6 lg:px-8">
-          {/* Books Grid */}
-          <div className="w-full grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 sm:gap-8">
-            {filteredBooks.map((book) => (
-              <div className="flex justify-center" key={book._id}>
-                <BookCard
-                  book={book}
-                  onIssue={handleIssueBook}
-                  onReturn={handleReturnBook}
-                  isIssued={issuedBooks.some(issuedBook => issuedBook.bookID === book._id)}
-                  onReadBook={() => handleReadBook(book)}
-                  onDelete={() => handleDeleteBook(book._id)}
-                  isAdmin={user?.isAdmin}
-                />
+        {/* Main Content with enhanced animations */}
+        <motion.div 
+          variants={staggerContainer}
+          initial="hidden"
+          animate="visible"
+          className="flex flex-col lg:flex-row gap-8 px-4 sm:px-6 lg:px-8"
+        >
+          {/* Books Grid with enhanced card animations */}
+          <motion.div
+            variants={containerVariants}
+            initial="hidden"
+            animate="visible"
+            className="flex-1"
+          >
+            {filteredBooks.length > 0 ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-5 gap-4">
+                {filteredBooks.map((book, index) => (
+                  <motion.div
+                    key={book._id}
+                    variants={itemVariants}
+                    custom={index}
+                    whileHover={{ 
+                      scale: 1.05,
+                      transition: { duration: 0.2 }
+                    }}
+                    whileTap={{ scale: 0.95 }}
+                    className="bg-[#1E1E1E] rounded-xl shadow-2xl overflow-hidden"
+                  >
+                    <BookCard
+                      book={book}
+                      onIssue={handleIssueBook}
+                      onReturn={handleReturnBook}
+                      isIssued={issuedBooks.some(issuedBook => issuedBook.bookID === book._id)}
+                      onReadBook={handleReadBook}
+                      onDelete={() => handleDeleteBook(book._id)}
+                      isAdmin={user?.isAdmin}
+                      onRate={() => onRate(book._id)}
+                    />
+                  </motion.div>
+                ))}
               </div>
-            ))}
-          </div>
+            ) : (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5 }}
+                className="flex flex-col items-center justify-center p-8 bg-[#1E1E1E] rounded-xl"
+              >
+                <BookOpen className="h-16 w-16 text-gray-600 mb-4" />
+                <h3 className="text-xl font-semibold text-gray-300 mb-2">No Books Found</h3>
+                <p className="text-gray-500 text-center">
+                  {searchTerm 
+                    ? `No books found matching "${searchTerm}"`
+                    : `No books available in the ${selectedCategory} category`}
+                </p>
+                <button
+                  onClick={() => {
+                    setSearchTerm('');
+                    setSelectedCategory('All');
+                  }}
+                  className="mt-4 px-6 py-2 bg-purple-600/10 text-purple-400 border border-purple-500/50 rounded-lg hover:bg-purple-600/20 transition-colors duration-300"
+                >
+                  Show All Books
+                </button>
+              </motion.div>
+            )}
+          </motion.div>
 
-          {/* Right Sidebar - Recent Activity */}
-          <div className="w-full lg:w-80 xl:w-96 space-y-6">
-            <div className="bg-white p-4 rounded-xl shadow-md">
-              <h2 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
-                <Clock className="h-5 w-5 text-orange-600" />
-                Recent Activity
-              </h2>
-              <div className="space-y-4">
-                {Object.entries(readingProgress).slice(0, 3).map(([bookId, page]) => {
-                  const book = books.find(b => b._id === bookId);
-                  return book ? (
-                    <div key={bookId} className="flex items-center gap-3 p-3 bg-orange-50 rounded-lg">
-                      <img 
-                        src={book.cover} 
-                        alt={book.bookName} 
-                        className="w-12 h-12 object-cover rounded"
-                      />
-                      <div>
-                        <p className="text-sm font-medium text-gray-800">{book.bookName}</p>
-                        <p className="text-xs text-gray-600">Page {page}</p>
-                      </div>
-                    </div>
-                  ) : null;
-                })}
-              </div>
-            </div>
-
-            {/* Top Authors */}
-            <div className="bg-white p-5 rounded-xl shadow-md">
-              <h2 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
-                <Users className="h-5 w-5 text-purple-600" />
+          {/* Right Sidebar with new animation */}
+          <motion.div
+            variants={fadeInUp}
+            initial="hidden"
+            animate="visible"
+            className="w-full lg:w-80 xl:w-96 space-y-6"
+          >
+            {/* Top Authors with new hover animation */}
+            <motion.div 
+              variants={scaleIn}
+              className="bg-[#1E1E1E] p-5 rounded-xl shadow-md"
+            >
+              <h2 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+                <Users className="h-5 w-5 text-purple-400" />
                 Popular Authors
               </h2>
               <div className="space-y-3">
                 {authors.map((author) => (
-                  <div 
+                  <motion.div 
                     key={author.name}
-                    className={`flex items-center justify-between p-3 rounded-lg bg-${author.color}-50 hover:bg-${author.color}-100 transition-colors cursor-pointer`}
+                    whileHover={{ 
+                      scale: 1.02,
+                      backgroundColor: "rgba(255,255,255,0.05)" 
+                    }}
+                    whileTap={{ scale: 0.98 }}
+                    className="flex items-center justify-between p-4 rounded-lg bg-[#242424] transition-colors cursor-pointer hover:shadow-lg"
                     onClick={() => setSearchTerm(author.name)}
                   >
-                    <span className="text-gray-700">{author.name}</span>
-                    <span className={`text-sm text-${author.color}-600`}>
-                      {author.books} {author.books === 1 ? 'book' : 'books'}
-                    </span>
-                  </div>
+                    <div className="flex items-center gap-3">
+                      <div className={`w-8 h-8 rounded-full bg-${author.color}-500/20 flex items-center justify-center`}>
+                        <Users className={`h-4 w-4 text-${author.color}-400`} />
+                      </div>
+                      <span className="text-gray-300 font-medium">{author.name}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm text-purple-400 font-medium">
+                        {author.books} {author.books === 1 ? 'book' : 'books'}
+                      </span>
+                      <svg 
+                        className="w-4 h-4 text-gray-500" 
+                        fill="none" 
+                        viewBox="0 0 24 24" 
+                        stroke="currentColor"
+                      >
+                        <path 
+                          strokeLinecap="round" 
+                          strokeLinejoin="round" 
+                          strokeWidth={2} 
+                          d="M9 5l7 7-7 7" 
+                        />
+                      </svg>
+                    </div>
+                  </motion.div>
                 ))}
-                {authors.length === 0 && (
-                  <div className="text-gray-500 text-center py-2">
-                    No authors found
-                  </div>
-                )}
               </div>
-            </div>
+            </motion.div>
+          </motion.div>
+        </motion.div>
+
+        {/* Library Assistant Button with new animation */}
+        <motion.button
+          initial={{ scale: 0, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ delay: 1, type: "spring", stiffness: 200 }}
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.9 }}
+          onClick={() => setShowChat(true)}
+          className="fixed bottom-4 right-4 bg-purple-600 hover:bg-purple-700 text-white font-medium p-3 rounded-full shadow-lg transition duration-300 flex items-center gap-2"
+        >
+          <MessageSquare className="h-5 w-5" />
+          <span className="hidden sm:inline">Ask Assistant</span>
+        </motion.button>
+
+        {/* Library Chat */}
+        {showChat && (
+          <div className="fixed bottom-12 right-3 z-40">
+            <LibraryChat
+              books={books}
+              onClose={() => setShowChat(false)}
+            />
           </div>
-        </div>
+        )}
+
+        {/* Rating Modal */}
+        {showRatingModal && selectedBookForRating && (
+          <RatingModal
+            book={selectedBookForRating}
+            onClose={() => setShowRatingModal(false)}
+            onRate={(rating) => handleRateBook(selectedBookForRating._id, rating)}
+          />
+        )}
 
         {/* Show PDF Viewer */}
         {showPdfViewer && selectedBook && (
@@ -726,6 +1049,7 @@ const Library = ({ user, onUserUpdate }) => {
             initialPage={readingProgress[selectedBook._id] || 1}
             onPageChange={(page) => handlePageChange(selectedBook._id, page)}
             onClose={handleClosePdf}
+            isPreview={!issuedBooks.some(issuedBook => issuedBook.bookID === selectedBook._id)}
           />
         )}
 
@@ -749,30 +1073,8 @@ const Library = ({ user, onUserUpdate }) => {
             </div>
           </div>
         )}
-
-        {/* Library Assistant Button - Fixed Position */}
-        <div className="fixed bottom-3 right-3 z-40">
-          <button
-            onClick={() => setShowChat(true)}
-            className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-1.5 px-2.5 sm:px-3 rounded-full shadow-lg transition duration-300 flex items-center gap-1 text-xs sm:text-sm"
-          >
-            <MessageSquare className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-            <span className="hidden sm:inline">Ask Assistant</span>
-            <span className="sm:hidden">Ask</span>
-          </button>
-        </div>
-
-        {/* Library Chat - Fixed Position */}
-        {showChat && (
-          <div className="fixed bottom-12 right-3 z-40">
-            <LibraryChat
-              books={books}
-              onClose={() => setShowChat(false)}
-            />
-          </div>
-        )}
       </div>
-    </div>
+    </motion.div>
   );
 };
 
@@ -780,18 +1082,22 @@ BookCard.propTypes = {
   book: PropTypes.shape({
     _id: PropTypes.string.isRequired,
     bookName: PropTypes.string.isRequired,
+    author: PropTypes.string.isRequired,
     cover: PropTypes.string.isRequired,
     rating: PropTypes.number.isRequired,
     available: PropTypes.number.isRequired,
     issued: PropTypes.number.isRequired,
     pdf: PropTypes.string,
+    description: PropTypes.string,
+    category: PropTypes.string.isRequired,
   }).isRequired,
-  onIssue: PropTypes.func,
-  onReturn: PropTypes.func,
+  onIssue: PropTypes.func.isRequired,
+  onReturn: PropTypes.func.isRequired,
   isIssued: PropTypes.bool.isRequired,
-  onReadBook: PropTypes.func,
-  onDelete: PropTypes.func,
+  onReadBook: PropTypes.func.isRequired,
+  onDelete: PropTypes.func.isRequired,
   isAdmin: PropTypes.bool.isRequired,
+  onRate: PropTypes.func.isRequired,
 };
 
 Library.propTypes = {

@@ -92,7 +92,7 @@ const App = () => {
   return (
     <div>
       {/* Navbar */}
-      <nav className="bg-gradient-to-r from-blue-600 to-blue-800 p-4 shadow-lg sticky top-0 z-50">
+      <nav className="bg-gradient-to-r from-gray-800 to-gray-600 p-4 shadow-lg sticky top-0 z-50">
         <div className="max-w-7xl mx-auto flex items-center justify-between text-white">
           <Link to="/" className="text-3xl font-extrabold tracking-wide">
             Overbooked

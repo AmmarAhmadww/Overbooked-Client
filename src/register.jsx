@@ -1,8 +1,12 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 
+/**
+ * Register component that handles user registration using email
+ */
 const Register = () => {
   const [formData, setFormData] = useState({
+    email: '',
     username: '',
     password: '',
     isAdmin: false,
@@ -11,6 +15,10 @@ const Register = () => {
   const [error, setError] = useState('');
   const navigate = useNavigate();
 
+  /**
+   * Handles input field changes
+   * @param {React.ChangeEvent<HTMLInputElement>} e - Input change event
+   */
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     setFormData((prevData) => ({
@@ -19,6 +27,10 @@ const Register = () => {
     }));
   };
 
+  /**
+   * Handles form submission and user registration
+   * @param {React.FormEvent<HTMLFormElement>} e - Form submission event
+   */
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
@@ -46,30 +58,46 @@ const Register = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 flex flex-col justify-center py-12 px-6 lg:px-8">
+    <div className="min-h-screen bg-gradient-to-br from-[#0a0a0a] to-[#1a1a1a] flex flex-col justify-center py-12 px-6 lg:px-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-lg">
-        <h2 className="mt-6 text-center text-4xl font-extrabold text-gray-900">
+        <h2 className="mt-6 text-center text-4xl font-extrabold text-white">
           Create a new account
         </h2>
-        <p className="mt-4 text-center text-lg text-gray-600">
+        <p className="mt-4 text-center text-lg text-gray-400">
           Or{' '}
-          <Link to="/login" className="font-medium text-blue-600 hover:text-blue-500">
+          <Link to="/login" className="font-medium text-cyan-400 hover:text-cyan-300">
             sign in to your account
           </Link>
         </p>
       </div>
 
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-lg">
-        <div className="bg-white py-8 px-6 shadow rounded-lg sm:px-10">
+        <div className="bg-[#121212] py-8 px-6 shadow-xl rounded-lg sm:px-10 border border-gray-800">
           {error && (
-            <div className="mb-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative">
+            <div className="mb-4 bg-red-900/50 border border-red-500 text-red-200 px-4 py-3 rounded relative">
               <span className="block sm:inline">{error}</span>
             </div>
           )}
 
           <form className="space-y-6" onSubmit={handleSubmit}>
             <div>
-              <label htmlFor="username" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="email" className="block text-sm font-medium text-gray-300">
+                Email Address
+              </label>
+              <input
+                id="email"
+                name="email"
+                type="email"
+                required
+                className="mt-1 block w-full bg-[#1a1a1a] border border-gray-700 rounded-md shadow-sm py-2 px-3 text-gray-200 focus:outline-none focus:ring-cyan-500 focus:border-cyan-500"
+                value={formData.email}
+                onChange={handleChange}
+                placeholder="Enter your email"
+              />
+            </div>
+
+            <div>
+              <label htmlFor="username" className="block text-sm font-medium text-gray-300">
                 Username
               </label>
               <input
@@ -77,14 +105,15 @@ const Register = () => {
                 name="username"
                 type="text"
                 required
-                className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                className="mt-1 block w-full bg-[#1a1a1a] border border-gray-700 rounded-md shadow-sm py-2 px-3 text-gray-200 focus:outline-none focus:ring-cyan-500 focus:border-cyan-500"
                 value={formData.username}
                 onChange={handleChange}
+                placeholder="Choose a username"
               />
             </div>
 
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="password" className="block text-sm font-medium text-gray-300">
                 Password
               </label>
               <input
@@ -92,9 +121,10 @@ const Register = () => {
                 name="password"
                 type="password"
                 required
-                className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                className="mt-1 block w-full bg-[#1a1a1a] border border-gray-700 rounded-md shadow-sm py-2 px-3 text-gray-200 focus:outline-none focus:ring-cyan-500 focus:border-cyan-500"
                 value={formData.password}
                 onChange={handleChange}
+                placeholder="Enter your password"
               />
             </div>
 
@@ -103,34 +133,35 @@ const Register = () => {
                 id="isAdmin"
                 name="isAdmin"
                 type="checkbox"
-                className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                className="h-4 w-4 text-cyan-500 focus:ring-cyan-500 bg-[#1a1a1a] border-gray-700 rounded"
                 checked={formData.isAdmin}
                 onChange={handleChange}
               />
-              <label htmlFor="isAdmin" className="ml-2 block text-sm text-gray-900">
+              <label htmlFor="isAdmin" className="ml-2 block text-sm text-gray-300">
                 Register as Administrator
               </label>
             </div>
 
             {formData.isAdmin && (
               <div>
-                <label htmlFor="adminCode" className="block text-sm font-medium text-gray-700">
+                <label htmlFor="adminCode" className="block text-sm font-medium text-gray-300">
                   Admin Registration Code
                 </label>
                 <input
                   id="adminCode"
                   name="adminCode"
                   type="password"
-                  className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                  className="mt-1 block w-full bg-[#1a1a1a] border border-gray-700 rounded-md shadow-sm py-2 px-3 text-gray-200 focus:outline-none focus:ring-cyan-500 focus:border-cyan-500"
                   value={formData.adminCode}
                   onChange={handleChange}
+                  placeholder="Enter admin code"
                 />
               </div>
             )}
 
             <button
               type="submit"
-              className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+              className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-black bg-cyan-400 hover:bg-cyan-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500 focus:ring-offset-[#121212]"
             >
               Register
             </button>

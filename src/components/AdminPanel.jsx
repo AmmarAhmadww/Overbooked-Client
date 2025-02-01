@@ -3,6 +3,7 @@ import { Navigate } from 'react-router-dom';
 import Toast from './Toast';
 import { Tabs, TabList, Tab, TabPanel } from 'react-tabs';
 import 'react-tabs/style/react-tabs.css';
+import { apiRequest } from '../config';
 
 const AdminPanel = ({ user }) => {
   const [pendingRequests, setPendingRequests] = useState([]);
@@ -21,13 +22,10 @@ const AdminPanel = ({ user }) => {
     if (!user?._id) return;
 
     try {
-      const response = await fetch("http://localhost:5000/admin/pending-requests", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+      const data = await apiRequest('/admin/pending-requests', {
+        method: 'POST',
         body: JSON.stringify({ userID: user._id })
       });
-
-      const data = await response.json();
       setPendingRequests(data);
     } catch (error) {
       console.error(error);
@@ -43,24 +41,30 @@ const AdminPanel = ({ user }) => {
 
   const fetchBookRequests = async () => {
     try {
-      const response = await fetch('http://localhost:5000/library/book-requests');
-      if (!response.ok) throw new Error('Failed to fetch book requests');
-      const data = await response.json();
+      const data = await apiRequest('/library/book-requests');
       setBookRequests(data);
     } catch (error) {
       console.error('Error fetching book requests:', error);
+      setToast({
+        show: true,
+        message: "Error loading book requests",
+        type: "error"
+      });
     }
   };
 
   const handleRequest = async (bookID, requestID, userID, status) => {
     try {
-      const response = await fetch("http://localhost:5000/admin/handle-request", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ bookID, requestID, userID, status })
+      const data = await apiRequest('/admin/handle-request', {
+        method: 'POST',
+        body: JSON.stringify({ 
+          bookID, 
+          requestID, 
+          userID, 
+          status,
+          userId: user._id // Add this for admin authentication
+        })
       });
-
-      if (!response.ok) throw new Error("Failed to handle request");
 
       setToast({
         show: true,
@@ -73,7 +77,7 @@ const AdminPanel = ({ user }) => {
       console.error(error);
       setToast({
         show: true,
-        message: "Error handling request",
+        message: error.message || "Error handling request",
         type: "error"
       });
     }
@@ -81,15 +85,13 @@ const AdminPanel = ({ user }) => {
 
   const handleBookRequest = async (requestId, status) => {
     try {
-      const response = await fetch(`http://localhost:5000/library/book-requests/${requestId}`, {
+      const data = await apiRequest(`/library/book-requests/${requestId}`, {
         method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ status }),
+        body: JSON.stringify({ 
+          status,
+          userId: user._id // Add this for admin authentication
+        })
       });
-
-      if (!response.ok) throw new Error('Failed to update request');
 
       setToast({
         show: true,

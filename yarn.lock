@@ -353,6 +353,20 @@
     "@nodelib/fs.scandir" "2.1.5"
     fastq "^1.6.0"
 
+"@pdf-lib/standard-fonts@^1.0.0":
+  version "1.0.0"
+  resolved "https://registry.npmjs.org/@pdf-lib/standard-fonts/-/standard-fonts-1.0.0.tgz"
+  integrity sha512-hU30BK9IUN/su0Mn9VdlVKsWBS6GyhVfqjwl1FjZN4TxP6cCw0jP2w7V3Hf5uX7M0AZJ16vey9yE0ny7Sa59ZA==
+  dependencies:
+    pako "^1.0.6"
+
+"@pdf-lib/upng@^1.0.1":
+  version "1.0.1"
+  resolved "https://registry.npmjs.org/@pdf-lib/upng/-/upng-1.0.1.tgz"
+  integrity sha512-dQK2FUMQtowVP00mtIksrlZhdFXQZPC+taih1q4CvPZ5vqdxR/LKBaFg0oAfzd1GlHZXXSPdQfzQnt+ViGvEIQ==
+  dependencies:
+    pako "^1.0.10"
+
 "@pkgjs/parseargs@^0.11.0":
   version "0.11.0"
   resolved "https://registry.npmjs.org/@pkgjs/parseargs/-/parseargs-0.11.0.tgz"
@@ -409,7 +423,7 @@
   dependencies:
     "@react-pdf-viewer/core" "3.12.0"
 
-"@react-pdf-viewer/page-navigation@3.12.0":
+"@react-pdf-viewer/page-navigation@^3.12.0", "@react-pdf-viewer/page-navigation@3.12.0":
   version "3.12.0"
   resolved "https://registry.npmjs.org/@react-pdf-viewer/page-navigation/-/page-navigation-3.12.0.tgz"
   integrity sha512-tVEJ48Dd5kajV1nKkrPWijglJRNBiKBTyYDKVexhiRdTHUP1f6QQXiSyDgCUb0IGSZeJzOJb1h7ApKHe8OTtuw==
@@ -1112,7 +1126,7 @@ clone@^2.1.2:
   resolved "https://registry.npmjs.org/clone/-/clone-2.1.2.tgz"
   integrity sha512-3Pe/CF1Nn94hyhIYpjtiLhdCoEoz0DqQ+988E9gmeEdQZlojxnOb74wctFyuwWQHzqyf9X7C7MG8juUpqBJT8w==
 
-clsx@^2.0.0:
+clsx@^2.0.0, clsx@^2.1.1:
   version "2.1.1"
   resolved "https://registry.npmjs.org/clsx/-/clsx-2.1.1.tgz"
   integrity sha512-eYm0QWBtUrBWZWG0d386OGAw16Z995PiOVo2B7bjWSbHedGl5e0ZWaq65kOGgUSNesEIDkB9ISbTg/JK9dhCZA==
@@ -1766,6 +1780,15 @@ fraction.js@^4.3.7:
   resolved "https://registry.npmjs.org/fraction.js/-/fraction.js-4.3.7.tgz"
   integrity sha512-ZsDfxO51wGAXREY55a7la9LScWpwv9RxIrYABrlvOFBlH/ShPnrtsXeuUIfXKKOVicNxQ+o8JTbJvjS4M89yew==
 
+framer-motion@^12.0.5:
+  version "12.0.5"
+  resolved "https://registry.npmjs.org/framer-motion/-/framer-motion-12.0.5.tgz"
+  integrity sha512-OgfUHfL+u80uCf6VzkV7j3+H2W9zPMdV+40bug4ftB0C2+0FpfNca2rbH2Fouq2R7//bjw6tJhOwXsrsM4+LKw==
+  dependencies:
+    motion-dom "^12.0.0"
+    motion-utils "^12.0.0"
+    tslib "^2.4.0"
+
 fs-constants@^1.0.0:
   version "1.0.0"
   resolved "https://registry.npmjs.org/fs-constants/-/fs-constants-1.0.0.tgz"
@@ -1920,6 +1943,11 @@ gopd@^1.0.1, gopd@^1.2.0:
   version "1.2.0"
   resolved "https://registry.npmjs.org/gopd/-/gopd-1.2.0.tgz"
   integrity sha512-ZUKRh6/kUFoAiTAtTYPZJ3hw9wNxx+BIBOijnlG9PnrJsCcSjs1wyyD6vJpaYtgnzDrKYRSqf3OO6Rfa93xsRg==
+
+gsap@^3.12.7:
+  version "3.12.7"
+  resolved "https://registry.npmjs.org/gsap/-/gsap-3.12.7.tgz"
+  integrity sha512-V4GsyVamhmKefvcAKaoy0h6si0xX7ogwBoBSs2CTJwt7luW0oZzC0LhdkyuKV8PJAXr7Yaj8pMjCKD4GJ+eEMg==
 
 has-bigints@^1.0.2:
   version "1.1.0"
@@ -2508,6 +2536,18 @@ mkdirp@^1.0.3:
   resolved "https://registry.npmjs.org/mkdirp/-/mkdirp-1.0.4.tgz"
   integrity sha512-vVqVZQyf3WLx2Shd0qJ9xuvqgAyKPLAiqITEtqW0oIUjzo3PePDd6fW9iFz30ef7Ysp/oiWqbhszeGWW2T6Gzw==
 
+motion-dom@^12.0.0:
+  version "12.0.0"
+  resolved "https://registry.npmjs.org/motion-dom/-/motion-dom-12.0.0.tgz"
+  integrity sha512-CvYd15OeIR6kHgMdonCc1ihsaUG4MYh/wrkz8gZ3hBX/uamyZCXN9S9qJoYF03GqfTt7thTV/dxnHYX4+55vDg==
+  dependencies:
+    motion-utils "^12.0.0"
+
+motion-utils@^12.0.0:
+  version "12.0.0"
+  resolved "https://registry.npmjs.org/motion-utils/-/motion-utils-12.0.0.tgz"
+  integrity sha512-MNFiBKbbqnmvOjkPyOKgHUp3Q6oiokLkI1bEwm5QA28cxMZrv0CbbBGDNmhF6DIXsi1pCQBSs0dX8xjeER1tmA==
+
 ms@^2.1.3:
   version "2.1.3"
   resolved "https://registry.npmjs.org/ms/-/ms-2.1.3.tgz"
@@ -2704,7 +2744,7 @@ pako@^0.2.5:
   resolved "https://registry.npmjs.org/pako/-/pako-0.2.9.tgz"
   integrity sha512-NUcwaKxUxWrZLpDG+z/xZaCgQITkA/Dv4V/T6bw7VON6l1Xz/VnrBqrYjZQ12TamKHzITTfOEIYUj48y2KXImA==
 
-pako@~1.0.5:
+pako@^1.0.10, pako@^1.0.11, pako@^1.0.6, pako@~1.0.5:
   version "1.0.11"
   resolved "https://registry.npmjs.org/pako/-/pako-1.0.11.tgz"
   integrity sha512-4hLB8Py4zZce5s4yd9XzopqwVv/yGNhV1Bl8NTmCq1763HeK2+EwVTv+leGeL13Dnh2wfbqowVPXCIO0z4taYw==
@@ -2759,7 +2799,17 @@ path2d@^0.2.1:
   resolved "https://registry.npmjs.org/path2d/-/path2d-0.2.2.tgz"
   integrity sha512-+vnG6S4dYcYxZd+CZxzXCNKdELYZSKfohrk98yajCo1PtRoDgCTrrwOvK1GT0UoAdVszagDVllQc0U1vaX4NUQ==
 
-"pdfjs-dist@^2.16.105 || ^3.0.279", pdfjs-dist@^3.4.120:
+pdf-lib@^1.17.1:
+  version "1.17.1"
+  resolved "https://registry.npmjs.org/pdf-lib/-/pdf-lib-1.17.1.tgz"
+  integrity sha512-V/mpyJAoTsN4cnP31vc0wfNA1+p20evqqnap0KLoRUN0Yk/p3wN52DOEsL4oBFcLdb76hlpKPtzJIgo67j/XLw==
+  dependencies:
+    "@pdf-lib/standard-fonts" "^1.0.0"
+    "@pdf-lib/upng" "^1.0.1"
+    pako "^1.0.11"
+    tslib "^1.11.1"
+
+"pdfjs-dist@^2.16.105 || ^3.0.279", pdfjs-dist@3.4.120:
   version "3.4.120"
   resolved "https://registry.npmjs.org/pdfjs-dist/-/pdfjs-dist-3.4.120.tgz"
   integrity sha512-B1hw9ilLG4m/jNeFA0C2A0PZydjxslP8ylU+I4XM7Bzh/xWETo9EiBV848lh0O0hLut7T6lK1V7cpAXv5BhxWw==
@@ -2927,7 +2977,7 @@ rc@^1.2.7:
     minimist "^1.2.0"
     strip-json-comments "~2.0.1"
 
-"react-dom@^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0", react-dom@^19.0.0, react-dom@>=16.8.0, react-dom@>=18:
+"react-dom@^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0", "react-dom@^18 || ^19", "react-dom@^18.0.0 || ^19.0.0", react-dom@^19.0.0, react-dom@>=16.8.0, react-dom@>=18:
   version "19.0.0"
   resolved "https://registry.npmjs.org/react-dom/-/react-dom-19.0.0.tgz"
   integrity sha512-4GV5sHFG0e/0AD4X+ySy6UJd3jVl1iNsNHdpad0qhABJ11twS3TTBnseqsKurKcsNqCEFeGL3uLpVChpIO3QfQ==
@@ -2983,7 +3033,14 @@ react-tabs@^6.1.0:
     clsx "^2.0.0"
     prop-types "^15.5.0"
 
-"react@^16.5.1 || ^17.0.0 || ^18.0.0 || ^19.0.0", "react@^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0", "react@^18.0.0 || ^19.0.0", react@^19.0.0, react@>=16.8.0, react@>=18:
+react-toastify@^11.0.3:
+  version "11.0.3"
+  resolved "https://registry.npmjs.org/react-toastify/-/react-toastify-11.0.3.tgz"
+  integrity sha512-cbPtHJPfc0sGqVwozBwaTrTu1ogB9+BLLjd4dDXd863qYLj7DGrQ2sg5RAChjFUB4yc3w8iXOtWcJqPK/6xqRQ==
+  dependencies:
+    clsx "^2.1.1"
+
+"react@^16.5.1 || ^17.0.0 || ^18.0.0 || ^19.0.0", "react@^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0", "react@^18 || ^19", "react@^18.0.0 || ^19.0.0", react@^19.0.0, react@>=16.8.0, react@>=18:
   version "19.0.0"
   resolved "https://registry.npmjs.org/react/-/react-19.0.0.tgz"
   integrity sha512-V8AVnmPIICiWpGfm6GLzCR/W5FXLchHop40W4nXBmdlEceh16rCN8O8LNWm5bh5XUX91fh7KpA+W0TgMKmgTpQ==
@@ -3568,7 +3625,12 @@ ts-interface-checker@^0.1.9:
   resolved "https://registry.npmjs.org/ts-interface-checker/-/ts-interface-checker-0.1.13.tgz"
   integrity sha512-Y/arvbn+rrz3JCKl9C4kVNfTfSm2/mEp5FSz5EsZSANGPSlQrpRI5M4PKF+mJnE52jOO90PnPSc3Ur3bTQw0gA==
 
-tslib@^2.8.0:
+tslib@^1.11.1:
+  version "1.14.1"
+  resolved "https://registry.npmjs.org/tslib/-/tslib-1.14.1.tgz"
+  integrity sha512-Xni35NKzjgMrwevysHTCArtLDpPvye8zV/0E4EyYn43P7/7qvQwPh9BGkHewbMulVntbigmcT7rdX3BNo9wRJg==
+
+tslib@^2.4.0, tslib@^2.8.0:
   version "2.8.1"
   resolved "https://registry.npmjs.org/tslib/-/tslib-2.8.1.tgz"
   integrity sha512-oJFu94HQb+KVduSUQL7wnpmqnfmLsOA/nAh6b6EH0wCEoK0/mPeXU6c3wKDV83MkOuHPRHtSXKKU99IBazS/2w==

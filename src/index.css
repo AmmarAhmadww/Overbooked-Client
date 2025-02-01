@@ -31,3 +31,20 @@
 .slide-out {
   animation: slideOut 0.3s ease-in forwards;
 }
+
+.pdf-document {
+  display: flex;
+  justify-content: center;
+  background-color: #1E1E1E;
+}
+
+.pdf-page {
+  max-width: 100%;
+  height: auto !important;
+  box-shadow: 0 0 10px rgba(0,0,0,0.5);
+}
+
+.pdf-page canvas {
+  max-width: 100%;
+  height: auto !important;
+}
